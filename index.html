@@ -2110,7 +2110,7 @@ function qApply(s,Y,alloc){const k=Y.mech.kind,lines=[],wl=[];const base=Y.mech.
     if(v.aliveNo!==undefined){const d0=Math.round(v.aliveNo*(QRATE[Y.y]||0)*v.sev/mechCount(s,Y.y));v.aliveNo-=d0;v.deadNo+=d0;}v.sent=(v.sent||0)+a;
     lines.push({t:trf("{0}（{1}）：送去 {2} {3}{4}。這段時間，又有 {5} 個人死去。",[v.name,v.county,a,QKIND[k].u,QKIND[k].n,d])+(a&&dZ>d?trf("如果這一次什麼都沒送，大約會死 {0} 個人。",[dZ]):''),loss:d>0});
     if(!a&&anyA){v.skip=(v.skip||0)+1;}if(!a&&anyA&&(s.qMail||[]).length<2)(s.qMail=s.qMail||[]).push(pick([trf("{0}的神父來信：別的地方都分到了東西，為什麼這一次，我們什麼也沒有？",[v.name]),trf("{0}的救濟委員會來信，信上只有一句話：我們這裡也有人在等。",[v.name])]));
-    if(d)wl.push(trf("{0}的神父來信，信上列了 {1} 個名字。",[v.name,d]));}
+    if(d){s.qWin=s.qWin||{};s.qWin[v.name]=(s.qWin[v.name]||0)+d;}}
   const left=qUnits(s,Y)-used;if(used>base)s.funds=cl5(s.funds-(used-base));else if(left>=2)s.funds=cl5(s.funds+Math.floor((base-used)/2));
   s.qSent=(s.qSent||0)+used;s.mechWinter=(s.mechWinter||[]).concat(wl);s.mechDone=true;return lines;}
 function qAuto(s,Y){const n=qUnits(s,Y),a={};s.vill.forEach((v,i)=>a[v.id]=Math.min(3,Math.floor(n/3)+(i<n%3?1:0)));return qApply(s,Y,a);}
@@ -2151,8 +2151,7 @@ function dApply(s,Y,ch){const w=s.ward,r=dSim(s,Y,ch),lines=[],wl=[];
     else if(dl<=-1&&neg.length)lines.push({t:trf("{0}，讓院裡這段時間大約多死了 {1} 個人。",[neg.join(tr("、")),(-dl).toLocaleString()]),loss:true});}
   if(r.awayN)lines.push({t:trf("被你請走的 {0} 個人，你不知道他們後來怎麼了。",[r.awayN.toLocaleString()])});
   if(r.outN)lines.push({t:trf("{0} 個人在院外領救濟。一碗粥，要走好幾里路來領。",[r.outN.toLocaleString()])});
-  wl.push(pick([trf("這個冬天，院裡又死了 {0} 個人。",[r.dIn]),trf("死亡名冊又寫滿了幾頁。這段時間，一共 {0} 個名字。",[r.dIn]),trf("挖墳的人說，後面那片地快滿了。這段時間，死了 {0} 個人。",[r.dIn])]));
-  if(r.awayN)wl.push(pick([tr("你聽說，鎮外的路邊又發現了幾個人。你沒有去問他們是誰。"),tr("門外那些被你請走的人，有幾個又回來了。你認出了他們的臉。")]));
+  s.dWin=(s.dWin||0)+r.dIn;if(r.awayN)s.dWinAway=true;
   s.mechWinter=(s.mechWinter||[]).concat(wl);s.mechDone=true;return lines;}
 function dAuto(s,Y){return dApply(s,Y,{f:s.ward.sheds?'shed':'main',st:'main',c:'main'});}
 function mechAuto(s,Y){if(!Y.mech||s.mechDone)return [];return s.mode==='quaker'?qAuto(s,Y):dAuto(s,Y);}
@@ -2770,6 +2769,10 @@ const RW={
   y1847:[tr("熱病房的木棚，一晚上被風吹倒了一角。")],y1848:[tr("被趕出家門的人，一車一車地送來。")],y1849:[tr("霍亂病人吐出來的東西，要用石灰蓋住。")],y1850:[tr("眼炎房裡的孩子，整天坐著，互相叫名字。")],y1851:[tr("普查員走了以後，院裡安靜了好幾天。")],y1852:[tr("院裡空出了好幾排床。")],y1853:[tr("墓地上長滿了草。")]}};
 function roleWinterLines(Y){const M=[tr("十月"),tr("十一月"),tr("十二月"),tr("一月"),tr("二月"),tr("三月"),tr("四月")];const R=RW[S.mode+'_'+S.post]||RW[S.mode];const out=[];const add=(i,t,loss)=>out.push({i,t,loss});const pk=a=>pick(a);
   add(0,pk(S.funds>=3?R.rich:R.poor));add(1,pk(R.work));if(R['y'+Y.y])add(2,pk(R['y'+Y.y]));
+  // one letter per village and one line for the house per winter, however many periods the year had
+  if(S.qWin){Object.entries(S.qWin).forEach(([nm,d],k)=>add(k<2?3:4,trf("{0}的神父來信，信上列了 {1} 個名字。",[nm,d]),true));S.qWin=null;}
+  if(S.dWin){const d=S.dWin;add(3,pick([trf("這個冬天，院裡又死了 {0} 個人。",[d]),trf("死亡名冊又寫滿了幾頁。這段時間，一共 {0} 個名字。",[d]),trf("挖墳的人說，後面那片地快滿了。這段時間，死了 {0} 個人。",[d])]),true);
+    if(S.dWinAway)add(4,pick([tr("你聽說，鎮外的路邊又發現了幾個人。你沒有去問他們是誰。"),tr("門外那些被你請走的人，有幾個又回來了。你認出了他們的臉。")]),true);S.dWin=0;S.dWinAway=false;}
   (S.mechWinter||[]).forEach((t,k)=>add(3+k%2,t,true));S.mechWinter=[];
   (S.reveals||[]).forEach(r=>add(Math.min(5,r.i+1),r.t,true));S.reveals=[];
   add(5,pk(R.texture));add(6,pk(R.spring));out.sort((a,b)=>a.i-b.i);return out.map(o=>({m:M[o.i],t:o.t,loss:o.loss}));}
