@@ -2462,7 +2462,9 @@ function epitaph(s,p){
   return trf("{0}，留在愛爾蘭，活到 {1} 歲。",[p.name,p.finalAge]);
 }
 function candidates(s){if(s.mode!=='family'||s.yi>=YEARS.length)return [];const y=YEARS[s.yi].y;return household(s).filter(m=>!m.played&&m.role!=='spouse'&&y-m.born>=12);}
-function switchTo(s,m){s.pi=m.id;m.played=true;m.startYear=YEARS[s.yi].y;m.health=YEARS[s.yi].y>=1847?3:4;s.curYi=-1;}
+const PERS=['fiddle','soc'];
+function switchTo(s,m){const o=s.fam[s.pi];if(o&&o!==m){o.pf=o.pf||{};PERS.forEach(k=>{if(s.flags[k]!==undefined)o.pf[k]=s.flags[k];delete s.flags[k];});if(m.pf)PERS.forEach(k=>{if(m.pf[k]!==undefined)s.flags[k]=m.pf[k];});}
+  s.pi=m.id;m.played=true;m.startYear=YEARS[s.yi].y;m.health=YEARS[s.yi].y>=1847?3:4;s.curYi=-1;}
 function resolveRest(s){if(s.mode!=='family')return;while(s.yi<YEARS.length){endYear(s,YEARS[s.yi].y);s.yi++;}}
 function memberFate(s,m){
   if(!m.alive){const base=trf("{0} 年{1}，{2} 歲",[m.deathYear,m.cause,m.deathYear-m.born]);return m.hidden?base+tr("。家人始終不知道，只以為對方從此沒有來信"):base;}
