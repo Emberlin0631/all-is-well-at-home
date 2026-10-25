@@ -104,7 +104,8 @@ details.fold[open] summary{margin-bottom:10px}
 .choices{display:grid;gap:10px}
 .choice{appearance:none;text-align:left;border:1px solid var(--line);background:var(--peat);color:var(--paper);border-radius:4px;
   padding:14px 16px;font-family:var(--f-ui);font-size:calc(15.5px*var(--fz,1));line-height:1.55;cursor:pointer;display:grid;gap:4px}
-.choice:hover{border-color:var(--lichen)}
+@media (hover:hover){.choice:hover{border-color:var(--lichen)}}
+.choice:active{border-color:var(--lichen)}
 .choice small{color:var(--dim);font-size:calc(12.5px*var(--fz,1))}
 .choice.alt{border-color:var(--lichen)}
 .link{appearance:none;border:0;background:none;color:var(--lichen);font-size:calc(13.5px*var(--fz,1));text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 0;justify-self:start;font-family:var(--f-ui)}
@@ -137,7 +138,7 @@ details.fold[open] summary{margin-bottom:10px}
 .btns.donate .muted{margin:-4px 0 6px;font-size:calc(13px*var(--fz,1))}
 a.btn{display:block;text-align:center;text-decoration:none}
 .link.donate-link{font-size:calc(15px*var(--fz,1));font-weight:600;text-decoration:none;color:var(--paper);border:1.5px solid var(--lichen);border-radius:999px;padding:6px 16px;align-self:center}
-.link.donate-link:hover{background:var(--peat)}
+@media (hover:hover){.link.donate-link:hover{background:var(--peat)}}
 .about p{font-size:calc(16px*var(--fz,1));line-height:1.85;margin:0 0 12px}.about h3{margin:26px 0 10px}.about a{color:var(--lichen);text-underline-offset:3px}.about i{font-style:italic;color:var(--paper)}
 .gl{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;line-height:inherit;cursor:help;border-bottom:1.5px dashed var(--lichen);border-radius:0}
 .gl:focus-visible{outline:2px solid var(--lichen);outline-offset:2px}
@@ -310,13 +311,6 @@ body.g3 .choices{animation:slowin 1.6s ease-in both}
 .fade{animation:fade .4s ease-out}
 @keyframes fade{from{opacity:.3}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}}
-.flip{position:fixed;left:0;top:0;right:0;bottom:0;z-index:15;pointer-events:none;perspective:1800px;perspective-origin:50% 40%;overflow:hidden}
-.flip .cast{position:absolute;left:0;top:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,.6),rgba(0,0,0,0) 70%);opacity:0}
-.flip .leaf{position:absolute;left:0;top:0;right:0;bottom:0;transform-origin:left center;transform-style:preserve-3d;will-change:transform}
-.flip .face{position:absolute;left:0;top:0;right:0;bottom:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:var(--bg);overflow:hidden}
-.flip .back{transform:rotateY(180deg);background:linear-gradient(90deg,#2a2b25,#1d1f1b 55%,#262822)}
-.flip .shade{position:absolute;left:0;top:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.8));opacity:0}
-@media (prefers-reduced-motion:reduce){.flip{display:none}}
 </style>
 
 </head>
@@ -2615,32 +2609,8 @@ function gloom(){
     else if(p.alive){g=(p.health<=2?1:0)+(p.health<=1?1:0)+(S.funds<=1?1:0);}}
   g=Math.min(3,g);document.body.className=g?'g'+g:'';try{Ambience.mood(g);}catch(e){}
 }
-let KEEPY=null,FLIPN=null;
-function flipPrep(){
-  try{
-    if(FLIPN){FLIPN.remove();FLIPN=null;}
-    if(KEEPY!=null||!app.firstElementChild||typeof Element.prototype.animate!=='function'||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return null;
-    const r=app.getBoundingClientRect(),cs=getComputedStyle(app);
-    const w=document.createElement('div');w.className='flip';w.setAttribute('aria-hidden','true');try{w.inert=true;}catch(e){}
-    w.innerHTML='<div class="cast"></div><div class="leaf"><div class="face front"><div class="clone"></div><div class="shade"></div></div><div class="face back"></div></div>';
-    const c=w.querySelector('.clone');c.innerHTML=app.innerHTML;
-    c.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));c.querySelectorAll('.fade').forEach(e=>e.classList.remove('fade'));
-    c.style.cssText=`position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;padding:${cs.padding};box-sizing:${cs.boxSizing};filter:${cs.filter}`;
-    document.body.appendChild(w);FLIPN=w;return w;
-  }catch(e){return null;}
-}
-function flipGo(w){
-  if(!w)return;
-  try{
-    const D=800,leaf=w.querySelector('.leaf'),shade=w.querySelector('.shade'),cast=w.querySelector('.cast');
-    const done=()=>{if(FLIPN===w)FLIPN=null;try{w.remove();}catch(e){}};
-    const a=leaf.animate([{transform:'rotateY(0deg)'},{transform:'rotateY(-180deg)'}],{duration:D,easing:'cubic-bezier(.35,.1,.45,.95)',fill:'forwards'});
-    shade.animate([{opacity:0},{opacity:.8}],{duration:D,easing:'cubic-bezier(.5,.05,.3,1)',fill:'forwards'});
-    cast.animate([{opacity:0},{opacity:.9,offset:.35},{opacity:0}],{duration:D,easing:'linear',fill:'forwards'});
-    a.onfinish=done;a.oncancel=done;setTimeout(done,D+500);
-  }catch(e){try{w.remove();}catch(_){}}
-}
-function show(html,focusSel){const lf=flipPrep();gloom();try{$('homeb').hidden=false;}catch(e){}if(S&&S.mode==='family'&&S.yi<YEARS.length)html=solo(S,html);if(LANG==='en')html=html.replace(/\s*・\s*/g,' · ').replace(/>([^<]+)</g,(m,t)=>'>'+t.replace(/([a-z0-9)%][.!?:]|”)(?=[A-Z“])/g,'$1 ')+'<');try{glClose();}catch(e){}const ky=KEEPY;KEEPY=null;app.innerHTML=`<section class="screen${ky==null&&!lf?' fade':''}">${html}</section>`;try{glossify();}catch(e){}window.scrollTo({top:ky==null?0:ky});const el=focusSel&&app.querySelector(focusSel);if(el)el.focus({preventScroll:true});flipGo(lf);}
+let KEEPY=null;
+function show(html,focusSel){gloom();try{$('homeb').hidden=false;}catch(e){}if(S&&S.mode==='family'&&S.yi<YEARS.length)html=solo(S,html);if(LANG==='en')html=html.replace(/\s*・\s*/g,' · ').replace(/>([^<]+)</g,(m,t)=>'>'+t.replace(/([a-z0-9)%][.!?:]|”)(?=[A-Z“])/g,'$1 ')+'<');try{glClose();}catch(e){}const ky=KEEPY;KEEPY=null;app.innerHTML=`<section class="screen${ky==null?' fade':''}">${html}</section>`;try{glossify();}catch(e){}window.scrollTo({top:ky==null?0:ky});const el=focusSel&&app.querySelector(focusSel);if(el)el.focus({preventScroll:true});}
 const homeName=s=>({home:s.clsHome,scalp:tr("路邊的草棚"),workhouse:tr("濟貧院"),town:tr("城裡的貧民窟")}[s.home]||'');
 const hl=s=>tr("<button class=\"link\" data-go=\"cards\">史料卡冊</button>");
 
