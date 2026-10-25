@@ -3370,7 +3370,7 @@ function renderLives(){const back=backTo||renderIntro;const L=livesGet();let arm
   const c=$('clr');if(c)c.onclick=()=>{if(!armed){armed=true;c.textContent=tr("再按一次，確定清除");return;}try{localStorage.removeItem('famineLives');}catch(e){}renderLives();};}
 
 // ===== donations: fill in the links below; buttons appear only for links that are set =====
-const DONATE={tw:'',twBy:tr("綠界科技"),kofi:'',records:[]};
+const DONATE={tw:'https://p.ecpay.com.tw/0BC0327',twBy:tr("綠界科技"),kofi:'',records:[]};
 function renderDonate(){const back=backTo||renderIntro;const any=DONATE.tw||DONATE.kofi;
   const recs=(DONATE.records||[]).slice().reverse();
   show(trf("<p class=\"kicker\">SUPPORT</p><h2 class=\"title\">贊助這個遊戲</h2>\n    <p class=\"story\">這個遊戲免費，不贊助也能玩到全部的內容。</p>\n    <div class=\"ledger\"><p><span>平均捐給 EPIC 愛爾蘭移民博物館，以及斯特羅克斯敦的國家饑荒博物館</span><b>一半</b></p><p><span>網站的維護與後續的開發</span><b>一半</b></p></div>\n    {0}\n    <h3 class=\"kicker\">捐款紀錄</h3>\n    {1}\n    <div class=\"btns\"><button class=\"btn ghost\" id=\"back\">返回</button></div>",[any?`<div class="btns donate">${DONATE.tw?trf("<a class=\"btn\" href=\"{0}\" target=\"_blank\" rel=\"noopener\">用台灣的付款方式贊助</a><p class=\"muted\">信用卡、ATM 轉帳、超商代碼{1}。</p>",[esc(DONATE.tw),DONATE.twBy?trf("，由{0}處理",[esc(DONATE.twBy)]):'']):''}${DONATE.kofi?trf("<a class=\"btn ghost\" href=\"{0}\" target=\"_blank\" rel=\"noopener\">從海外贊助（Ko-fi）</a><p class=\"muted\">PayPal 或國際信用卡。</p>",[esc(DONATE.kofi)]):''}</div>`:tr("<p class=\"muted\">贊助連結準備中。</p>"),recs.length?`<ol class="log">${recs.map(r=>`<li><b>${esc(r.d)}</b>${esc(r.t)}</li>`).join('')}</ol>`:tr("<p class=\"muted\">目前還沒有捐款紀錄。每一筆轉給博物館的捐款，都會記在這裡。</p>")]),'#back');
