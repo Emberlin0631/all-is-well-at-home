@@ -311,6 +311,13 @@ body.g3 .choices{animation:slowin 1.6s ease-in both}
 .fade{animation:fade .4s ease-out}
 @keyframes fade{from{opacity:.3}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}}
+@media (min-width:1100px){
+ #app{max-width:1000px}
+ .screen{grid-template-columns:minmax(0,640px);justify-content:center}
+ .screen.two{grid-template-columns:minmax(0,600px) 300px;column-gap:56px;align-content:start}
+ .screen.two>*{grid-column:1}
+ .screen.two>.side{grid-column:2;display:grid;gap:14px;align-self:start;position:sticky;top:72px;max-height:calc(100vh - 96px);overflow:auto;align-content:start}
+}
 </style>
 
 </head>
@@ -2610,7 +2617,23 @@ function gloom(){
   g=Math.min(3,g);document.body.className=g?'g'+g:'';try{Ambience.mood(g);}catch(e){}
 }
 let KEEPY=null;
-function show(html,focusSel){gloom();try{$('homeb').hidden=false;}catch(e){}if(S&&S.mode==='family'&&S.yi<YEARS.length)html=solo(S,html);if(LANG==='en')html=html.replace(/\s*・\s*/g,' · ').replace(/>([^<]+)</g,(m,t)=>'>'+t.replace(/([a-z0-9)%][.!?:]|”)(?=[A-Z“])/g,'$1 ')+'<');try{glClose();}catch(e){}const ky=KEEPY;KEEPY=null;app.innerHTML=`<section class="screen${ky==null?' fade':''}">${html}</section>`;try{glossify();}catch(e){}window.scrollTo({top:ky==null?0:ky});const el=focusSel&&app.querySelector(focusSel);if(el)el.focus({preventScroll:true});}
+function sideify(){
+  try{
+    if(!(window.matchMedia&&matchMedia('(min-width:1100px)').matches))return;
+    const sc=app.querySelector('.screen');if(!sc)return;
+    const st=sc.querySelector(':scope > .status');if(!st)return;
+    const mv=[],dropRule=e=>{const p=e&&e.previousElementSibling;if(p&&p.classList.contains('rule'))p.remove();};
+    dropRule(st);mv.push(st);
+    for(let n=st.nextElementSibling;n&&n.tagName==='P'&&(n.classList.contains('where')||n.classList.contains('body-line'))&&!n.classList.contains('abs');n=n.nextElementSibling)mv.push(n);
+    const fam=sc.querySelector(':scope > ul.family'),h=fam&&fam.previousElementSibling;
+    if(fam&&h&&h.tagName==='H3'){dropRule(h);mv.push(h,fam);}
+    const side=document.createElement('aside');side.className='side';
+    mv.forEach(e=>side.appendChild(e));
+    sc.appendChild(side);sc.classList.add('two');
+    side.style.gridRow='1 / span '+Math.max(1,sc.children.length-1);
+  }catch(e){}
+}
+function show(html,focusSel){gloom();try{$('homeb').hidden=false;}catch(e){}if(S&&S.mode==='family'&&S.yi<YEARS.length)html=solo(S,html);if(LANG==='en')html=html.replace(/\s*・\s*/g,' · ').replace(/>([^<]+)</g,(m,t)=>'>'+t.replace(/([a-z0-9)%][.!?:]|”)(?=[A-Z“])/g,'$1 ')+'<');try{glClose();}catch(e){}const ky=KEEPY;KEEPY=null;app.innerHTML=`<section class="screen${ky==null?' fade':''}">${html}</section>`;sideify();try{glossify();}catch(e){}window.scrollTo({top:ky==null?0:ky});const el=focusSel&&app.querySelector(focusSel);if(el)el.focus({preventScroll:true});}
 const homeName=s=>({home:s.clsHome,scalp:tr("路邊的草棚"),workhouse:tr("濟貧院"),town:tr("城裡的貧民窟")}[s.home]||'');
 const hl=s=>tr("<button class=\"link\" data-go=\"cards\">史料卡冊</button>");
 
