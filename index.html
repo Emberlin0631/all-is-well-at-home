@@ -3104,7 +3104,7 @@ function renderRations(Y,msgs){
   draw();
 }
 function renderOutcome(Y,msgs,lines){
-  const p=P(S);
+  const p=P(S);if(S.mode==='family'){msgs=msgs.map(soloW);lines=lines.map(l=>({...l,t:soloW(l.t)}));}
   const winter=S.mode==='family'&&Y.y>=1846&&Y.y<=1853&&S.wasHome;
   const nxY=S.mode!=='family'?years(S)[S.yi]:null;const rwinter=S.mode!=='family'&&P(S).alive&&(!nxY||nxY.y!==Y.y);
   if(winter)lines=lines.filter(l=>l.kind!=='death'&&l.kind!=='away');
