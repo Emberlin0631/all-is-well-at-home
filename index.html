@@ -302,9 +302,9 @@ html[lang=en] dl.gloss dt::first-letter{text-transform:uppercase}html[lang=en] .
 .mourn .nm{font-family:var(--f-serif);font-size:calc(34px*var(--fz,1));font-weight:900;line-height:1.2}
 .mourn .yrs{font-family:var(--f-date);font-size:calc(22px*var(--fz,1));color:var(--dim);font-variant-numeric:oldstyle-nums}
 .mourn .mem{font-family:var(--f-serif);font-size:calc(17px*var(--fz,1));line-height:1.8;color:var(--paper);max-width:28em}
-body.g1 #app{filter:saturate(.8)}
-body.g2 #app{filter:saturate(.55) brightness(.94)}
-body.g3 #app{filter:saturate(.3) brightness(.88)}
+body.g1 #app .screen>*:not(.side),body.g1 #app .side>*{filter:saturate(.8)}
+body.g2 #app .screen>*:not(.side),body.g2 #app .side>*{filter:saturate(.55) brightness(.94)}
+body.g3 #app .screen>*:not(.side),body.g3 #app .side>*{filter:saturate(.3) brightness(.88)}
 body.g3 .choices{animation:slowin 1.6s ease-in both}
 @keyframes slowin{0%,55%{opacity:0}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.winter li,body.g3 .choices{animation:none}}
@@ -317,7 +317,7 @@ body.g3 .choices{animation:slowin 1.6s ease-in both}
  .screen{grid-template-columns:minmax(0,640px);justify-content:center}
  .screen.two{grid-template-columns:minmax(0,600px) 300px;column-gap:56px;align-content:start}
  .screen.two>*{grid-column:1}
- .screen.two>.side{grid-column:2;display:grid;gap:14px;align-self:start;position:sticky;top:92px;max-height:calc(100vh - 116px);overflow:auto;align-content:start}
+ .screen.two>.side{grid-column:2;display:grid;gap:14px;align-self:start;position:fixed;top:92px;left:calc(50% + 178px);width:300px;max-height:calc(100vh - 116px);overflow:auto;align-content:start}
 }
 </style>
 
